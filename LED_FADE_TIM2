@@ -1,0 +1,42 @@
+#include "stm32f1xx.h"
+
+void tim_config(void)
+{
+	 TIM2->CR1 |= (1<<0); //CEN and APRE
+	 TIM2->PSC = 7;
+	 TIM2->ARR = 255;
+	 TIM2->CCR1=0;
+	 TIM2->CCMR1 |= ((1<<11)|(1<<14)|(1<<13));
+	 TIM2->CCMR1 &= ~((1<<12));
+	 TIM2->CCER |= (1<<4);
+}
+
+void delay(void)
+{
+	int k;
+	for(int i=0;i<5000;i++)
+    k++;
+}
+int main()
+{
+	RCC->APB2ENR |= ((1<<2)|(1<<0));
+	RCC->APB1ENR |= (1<<0);
+	GPIOA->CRL |= ( (1<<4) | (1<<5)); //OUTPUT PUSH PULL & 50MHZ
+	GPIOA->CRL &= ~( (1<<6) );
+	GPIOA->CRL |= (1<<7);
+	tim_config();
+	while(1)
+	{
+		for(int j=0; j<255;j++)
+		{
+			TIM2->CCR2=j;
+			delay();
+	    }
+		for(int j=255;j>=0;j--)
+		{
+			TIM2->CCR2=j;
+			delay();
+	    }
+	}
+}
+
